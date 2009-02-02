@@ -6,12 +6,13 @@ $LOAD_PATH << File.dirname(__FILE__)
 require 'lib/snowflake'
 
 get '/' do
-  Snowflake.new.draw
   erb :index
 end
 
-get '/restart' do
-  Rush::Box[ Dir.pwd ]['public/snowsnowflake*.png'].destroy
+post '/start' do
+  Rush::Box.new[ Dir.pwd + '/']['public/snowflake*.png'].each { |f| f.destroy }
+  Snowflake.new.draw_each_piece
+  #Snowflake.generate(params)
   redirect '/'
 end
 
