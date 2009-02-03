@@ -5,11 +5,11 @@ require 'json'
 require 'mq'
 
 
-class Snowflake
+class FractMQ
   include Fractals
 
   def initialize opt=nil
-    opt = Snowflake.clean_json_hash( opt || {} )
+    opt = FractMQ.clean_json_hash( opt || {} )
     set_side( opt[:side] ||= 3 )
     set_defaults
     set_piece( opt[:piece] ||= [0,0] )
@@ -23,7 +23,7 @@ class Snowflake
   end
 
   def self.generate params 
-    snowflake = Snowflake.new( params )
+    snowflake = FractMQ.new( params )
     snowflake.start_queue
     EM.run { snowflake.each_tile { |tile| snowflake.publish_piece tile } }
   end
@@ -39,7 +39,7 @@ class Snowflake
         MQ.queue('fractal rebuild').bind( MQ.topic, :key => 'fractal.piece').subscribe do |msg|
           msg = JSON.parse(msg)
           data = msg.delete("png")
-          file_name = Snowflake.new(msg).piece_name
+          file_name = FractMQ.new(msg).piece_name
           puts "Writing >--  " + file_name
           File.delete file_name if File.exists? file_name
           File.open( file_name, "w") { |file| file.print Base64.decode64(data) }

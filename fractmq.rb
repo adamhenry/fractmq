@@ -15,7 +15,7 @@ end
 get '/start/:side' do
   params["side"] = ( params["side"] ||= 3 ).to_i
   pwd['public/snowflake*.png'].each { |f| f.destroy }
-  Snowflake.generate(params)
+  FractMQ.generate(params)
   redirect '/' + params["side"].to_s
 end
 
