@@ -3,7 +3,7 @@ require 'sinatra'
 
 $LOAD_PATH << File.dirname(__FILE__)
 
-require 'lib/fractmq'
+require 'lib/fractalmq'
 
 [ '/', '/:side/?' ].each do |path|
   get path do

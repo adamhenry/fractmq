@@ -4,7 +4,7 @@ require 'json'
 require 'base64'
 
 $LOAD_PATH << File.dirname(__FILE__)
-require 'lib/snowflake'
+require 'lib/fractmq'
 
 
 EM.run do
