@@ -23,6 +23,7 @@
     <div id="fractal">
       <% params["side"].to_i.times do |i| %>
         <% params["side"].to_i.times do |j| %><img src="snowflake<%= "#{j}.#{params["side"]-(i+1)}.png" %>" /><% end %>
+      <br />
       <% end %>
     </div>
     <a href="start/<%= params["side"] %>">Restart</a>

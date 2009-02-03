@@ -9,17 +9,10 @@ class FractMQ
   include Fractals
 
   def initialize opt=nil
-    opt = FractMQ.clean_json_hash( opt || {} )
-    set_side( opt[:side] ||= 3 )
+    opt = opt || {}
+    set_side( opt["side"] ||= 3 )
     set_defaults
-    set_piece( opt[:piece] ||= [0,0] )
-  end
-
-  ## CUT
-  def self.clean_json_hash old_hash
-    new_hash = {}
-    old_hash.each_pair { |key, value| new_hash[key.to_sym] = value }
-    new_hash
+    set_piece( opt["piece"] ||= [0,0] )
   end
 
   def self.generate params 
