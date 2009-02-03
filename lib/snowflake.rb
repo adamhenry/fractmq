@@ -63,7 +63,15 @@ class FractMQ
 
   def piece_name p=nil
     p ||= @snowflake.piece
-    "public/snowflake#{p[0]}.#{p[1]}.png"
+    FractMQ.dir + FractMQ.base_file_name + p.join('.') + ".png"
+  end
+
+  def self.base_file_name
+    "fractmq."
+  end
+
+  def self.dir
+    "public/"
   end
   
   def set_piece p

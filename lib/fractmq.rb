@@ -7,6 +7,6 @@ def box
 end
 
 def pwd
-  @pwd ||= box[ Dir.pwd + '/']
+  @pwd ||= box[ Dir.pwd + '/' + FractMQ.dir ]
 end
 

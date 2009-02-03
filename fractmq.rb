@@ -14,7 +14,7 @@ end
 
 get '/start/:side' do
   params["side"] = ( params["side"] ||= 3 ).to_i
-  pwd['public/snowflake*.png'].each { |f| f.destroy }
+  pwd[FractMQ.base_file_name + '*.png'].each { |f| f.destroy }
   FractMQ.generate(params)
   redirect '/' + params["side"].to_s
 end
