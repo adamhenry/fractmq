@@ -38,7 +38,7 @@ module Fractals
 
     def validate_pieces
       raise "pieces is not an array it is #{ pieces.class }" unless pieces.class == Array
-      raise "piece is not an array" unless piece.class == Array
+      raise "piece is not an array it is #{ piece.class }" unless piece.class == Array
       raise "pieces is not 2 deep" unless pieces.size == 2
       raise "piece is not 2 deep" unless piece.size == 2
       raise "pieces less than zero" if pieces[0] < 0

@@ -1,52 +1,81 @@
+require 'base64'
 require 'vender/lib/fractals'
-require 'png'
-require 'rubygems'
 require 'rush'
 require 'json'
 require 'mq'
 
+
 class Snowflake
   include Fractals
 
-  def initialize side = 3
-    @side = side
+  def initialize opt=nil
+    opt = Snowflake.clean_json_hash( opt || {} )
+    set_side( opt[:side] ||= 3 )
     set_defaults
-      
-    @x = []
-    @side.times do |i|
-      @side.times do |j|
-        @x << [ i, j ]
+    set_piece( opt[:piece] ||= [0,0] )
+  end
+
+  def self.clean_json_hash old_hash
+    new_hash = {}
+    old_hash.each_pair { |key, value| new_hash[key.to_sym] = value }
+    new_hash
+  end
+
+  def self.generate params 
+    snowflake = Snowflake.new( params[:side] )
+    snowflake.start_queue
+    EM.run { snowflake.each_tile { |tile| snowflake.publish_piece tile } }
+  end
+
+  def each_tile number=nil
+    (number ||= @side).times { |i| number.times { |j| yield [i, j] } }
+  end
+  
+  def start_queue
+    path = Dir.pwd + '/'
+    EM.run do
+      if !MQ.queue('fractal rebuild').subscribed?
+        MQ.queue('fractal rebuild').bind( 'fractal', :key => 'fractal.piece').subscribe do |msg|
+          msg = JSON.parse(msg)
+          data = msg.delete("png")
+          file_name = Snowflake.new(msg).piece_name
+          print "Writing >--  " + file_name
+          STDOUT.flush()
+          File.delete file_name if File.exists? file_name
+          File.open( file_name, "w") { |file| file.print Base64.decode64(data) }
+          puts " --<  Done"
+          STDOUT.flush()
+        end
       end
     end
   end
 
-  def draw_each_piece
-    @x.each do |p|
-      publish_draw_piece p
+  def publish_piece p=nil
+    set_piece p ||= @snowflake.piece
+    unless File.exists?( piece_name )
+      puts ("Publishing Fractal Segment Request: " + piece_name )
+      msg = {}
+      msg[:side] = @side
+      msg[:piece] = p
+      MQ.topic('fractal').publish(msg.to_json, :routing_key => 'fractal.piece.draw')
     end
   end
 
-  def publish_draw_piece p
-    puts ("Publishing Fractal Segment Request: " + piece_name( p ) )
-    puts "JSON:[#{@snowflakes.to_json}]"
-    EM.run do
-      MQ.topic('fractal').publish(p.to_json)
-    end
+  def draw_piece p=nil
+    set_piece ( p ||= @snowflake.piece ) 
+    file_name = "/tmp/fracMQ.#{@side}.#{rand(999_999)}.#{p[0]}.#{p[1]}##{Process.pid}"
+    @snowflake.draw( file_name )
+    file = IO.read file_name
+    File.delete(file_name)
+    file
   end
 
-  def draw_piece p
-    file = Rush::Box.new[Dir.pwd+'/'][piece_name(p)]
-    if file.exists?
-      puts ("File Exists: " + piece_name( p ) )
-    else
-      file.write('')
-      puts ("Creating File: " + piece_name(p) )
-      @snowflakes.piece = p
-      @snowflakes.draw( piece_name(p) )
-    end
+  def piece_name p=nil
+    p ||= @snowflake.piece
+    "public/snowflake#{p[0]}.#{p[1]}.png"
   end
-
-  def piece_name p
+  
+  def set_piece p
     raise "peice must be an Array <#{p.class}>" if p.class != Array 
     raise "peice must have a length of 2 <#{p.length}>" if p.length != 2 
     raise "peice[0] must be a Fixeum <#{p[0].class}>" if p[0].class != Fixnum 
@@ -55,19 +84,24 @@ class Snowflake
     raise "peice[0] must be < #{@side} <#{p[0]}>" if p[1] >= @side 
     raise "peice[0] must be >= 0 <#{p[0]}>" if p[0] < 0 
     raise "peice[1] must be >= 0 <#{p[1]}>" if p[1] < 0 
-    "public/snowflakes#{p[0]}.#{p[1]}.png"
+    @snowflake.piece = p
   end
-    
-  
+
+  def set_side side
+    raise "side must be a Fixnum <#{side.inspect}>" unless side.is_a?(Fixnum)
+    raise "side must be > 0 <#{side.inspect}>" unless side > 0
+    @side = side
+  end
+
   def set_defaults
-    @snowflakes = Julia.new(Complex(-0.3007, 0.6601), 5, 100)
-    @snowflakes.pieces =  [ @side, @side ]
-    @snowflakes.width = 360
-    @snowflakes.height = 360
-    @snowflakes.m = 2
-    @snowflakes.set_color = PNG::Color::White
-    @snowflakes.algorithm = Algorithms::NormalizedIterationCount
-    @snowflakes.theme = lambda { |index|
+    @snowflake = Julia.new(Complex(-0.3007, 0.6601), 5, 100)
+    @snowflake.pieces = [ @side, @side ]
+    @snowflake.width = 360
+    @snowflake.height = 360
+    @snowflake.m = 2
+    @snowflake.set_color = PNG::Color::White
+    @snowflake.algorithm = Algorithms::NormalizedIterationCount
+    @snowflake.theme = lambda { |index|
       r, g, b = 0, 0, 0      
       if index >= 510
         r = 0

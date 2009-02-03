@@ -9,10 +9,10 @@ get '/' do
   erb :index
 end
 
-post '/start' do
+get '/start' do
+  params ||= {}
   Rush::Box.new[ Dir.pwd + '/']['public/snowflake*.png'].each { |f| f.destroy }
-  Snowflake.new.draw_each_piece
-  #Snowflake.generate(params)
+  Snowflake.generate(params)
   redirect '/'
 end
 
