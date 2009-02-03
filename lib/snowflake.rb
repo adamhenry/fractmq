@@ -15,6 +15,7 @@ class Snowflake
     set_piece( opt[:piece] ||= [0,0] )
   end
 
+  ## CUT
   def self.clean_json_hash old_hash
     new_hash = {}
     old_hash.each_pair { |key, value| new_hash[key.to_sym] = value }

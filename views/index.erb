@@ -5,34 +5,26 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <title>Asynchnons Fractal Generation</title>
     <style type="text/css" media="screen">
-      table, tr, td, tbody, img {
+      img {
         border: 0px;
         margin: 0px;
         padding: 0px;
-      }
-      table {
-        border: solid black 1px;
-        height: <%= 360 + 2 * ( 1 + params["side"] ) %>px;
-        width: <%= 360 + 2 * ( 1 + params["side"] ) %>px;
-      }
-      td, img {
         height: <%= 360/params["side"] %>px;
         width: <%= 360/params["side"] %>px;
       }
+      #fractal {
+        height: 360px;
+        width: 360px;
+        margin-right: auto;
+        margin-left: auto;
+      }
     </style>
   </head>
-  <body>
-    <table>
+    <div id="fractal">
       <% params["side"].to_i.times do |i| %>
-      <tr>
-        <% params["side"].to_i.times do |j| %>
-        <td>
-          <img src="snowflake<%= "#{j}.#{params["side"]-(i+1)}.png" %>" />
-        </td>
-        <% end %>
-      </tr>
+        <% params["side"].to_i.times do |j| %><img src="snowflake<%= "#{j}.#{params["side"]-(i+1)}.png" %>" /><% end %>
       <% end %>
-    </table>
+    </div>
     <a href="start/<%= params["side"] %>">Restart</a>
   </body>
 </html>
