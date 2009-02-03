@@ -1,12 +1,21 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <style>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>Asynchnons Fractal Generation</title>
+    <style type="text/css" media="screen">
       table, tr, td, tbody, img {
         border: 0px;
         margin: 0px;
         padding: 0px;
       }
-      img {
+      table {
+        border: solid black 1px;
+        height: <%= 360 + 2 * ( 1 + params["side"] ) %>px;
+        width: <%= 360 + 2 * ( 1 + params["side"] ) %>px;
+      }
+      td, img {
         height: <%= 360/params["side"] %>px;
         width: <%= 360/params["side"] %>px;
       }
@@ -17,11 +26,13 @@
       <% params["side"].to_i.times do |i| %>
       <tr>
         <% params["side"].to_i.times do |j| %>
-        <td><img src="snowflake<%= "#{j}.#{params["side"]-(i+1)}.png" %>" /></td>
+        <td>
+          <img src="snowflake<%= "#{j}.#{params["side"]-(i+1)}.png" %>" />
+        </td>
         <% end %>
       </tr>
       <% end %>
     </table>
     <a href="start/<%= params["side"] %>">Restart</a>
   </body>
-<html>
+</html>

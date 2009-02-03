@@ -35,16 +35,13 @@ class Snowflake
     path = Dir.pwd + '/'
     EM.run do
       if !MQ.queue('fractal rebuild').subscribed?
-        MQ.queue('fractal rebuild').bind( 'fractal', :key => 'fractal.piece').subscribe do |msg|
+        MQ.queue('fractal rebuild').bind( MQ.topic, :key => 'fractal.piece').subscribe do |msg|
           msg = JSON.parse(msg)
           data = msg.delete("png")
           file_name = Snowflake.new(msg).piece_name
-          print "Writing >--  " + file_name
-          STDOUT.flush()
+          puts "Writing >--  " + file_name
           File.delete file_name if File.exists? file_name
           File.open( file_name, "w") { |file| file.print Base64.decode64(data) }
-          puts " --<  Done"
-          STDOUT.flush()
         end
       end
     end
@@ -57,7 +54,7 @@ class Snowflake
       msg = {}
       msg[:side] = @side
       msg[:piece] = p
-      MQ.topic('fractal').publish(msg.to_json, :routing_key => 'fractal.piece.draw')
+      MQ.topic.publish(msg.to_json, :routing_key => 'fractal.piece.draw')
     end
   end
 

@@ -8,14 +8,14 @@ require 'lib/snowflake'
 
 
 EM.run do
-  exchange = MQ.topic('fractal')
+  exchange = MQ.topic
   MQ.queue('draw fractal pieces').bind(exchange, :key => 'fractal.piece.draw' ).subscribe do |msg|
-    msg = Snowflake.clean_json_hash JSON.parse(msg)
-    print "Generating Piece #{msg[:piece].to_json} ...."
-    STDOUT.flush()
-    msg[:png] = Base64.encode64( Snowflake.new( msg ).draw_piece )
-    puts " Done"
-    STDOUT.flush()
-    exchange.publish(msg.to_json, :routing_key => 'fractal.piece' )
+    EM.defer proc {
+      msg = Snowflake.clean_json_hash JSON.parse(msg)
+      puts "Begin #{msg[:piece].to_json}"
+      msg[:png] = Base64.encode64( Snowflake.new( msg ).draw_piece )
+      puts "End #{msg[:piece].to_json}"
+      exchange.publish(msg.to_json, :routing_key => 'fractal.piece' )
+    }
   end
 end
