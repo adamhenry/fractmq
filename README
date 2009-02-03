@@ -1,12 +1,55 @@
-
 ======= FractMQ =======
 
 Purpose:
 
+FractMQ is a proof I wrote the gain experience with using the AMQP protocol.
+It allows the user to generate a fractal by slicing the work up into small
+pieces.  AMQP is used both to scatter the work orders to a cluster of worker
+processes and as a data transport layer to gather them back up to assemble
+to final product.
+
 How To Run It:
+
+FractMQ assumes that you have an out-of-the-box RabbitMQ server running at
+localhost to broker the messages.
+
+To start the web app component run the Sinatra app:
+
+   $ruby fractmq.rb
+
+You must have at least one worker process running.  It currently looks for
+the AMQP server on localhost but could be run on any computer if it were
+able to (and configured to) access the AMQP cluster.
+
+   $ruby worker.rb
+
+The app should be accessible at http://localhost:4567/  Once in the app you can 
+select the number of slices for the image and the "Generate" button will begin
+the process.  Reload the web page several times and you can see the images
+filling in as they are generated.
 
 How It Works:
 
+One AMQP message is sent per chunk of the image to generate.  The message data 
+is a hash converted to JSON before being sent.  The worker process uses a
+deferred EventMachine task to do the image processing.  Once done, the PNG
+image is base64 bit encoded and sent back to the originating process to be
+written to disk.  This more or less follows the Scatter/Gather pattern and
+leverages the Actor Model via the asynchronous nature of AMQP.  In theory it
+could scale to almost any level given the share-nothing nature of the process
+and create fractals of immense size having tens of thousands of workings using
+thousands of CPU's.
+
 What's Next?
 
+The next obvious steps for this app would be some Javascript on the front-end
+to cause the images to appear automatically. I want to stitch the
+pieces together into a single, complete PNG when the last one arrives.  I also
+want to have the number of workers and their load reported on the page's
+dashboard.  The size of the image, what fractal is to be generated, and the
+coloring scheme should also be selectable.  Lastly, the system assumes only a
+single user and could be made to generate several fractals in parallel for
+several users by simply adding a job number to the file names.
+
 =======================
+

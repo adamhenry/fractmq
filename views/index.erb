@@ -15,17 +15,36 @@
       #fractal {
         height: 360px;
         width: 360px;
+        border: black solid 1px;
+      }
+      .fractal-body {
+        width: 360px;
         margin-right: auto;
         margin-left: auto;
       }
+      h2 {
+        text-align: center;
+      }
     </style>
   </head>
-    <div id="fractal">
-      <% params["side"].to_i.times do |i| %>
-        <% params["side"].to_i.times do |j| %><img src="<%= part_file_name(j, i) %>" /><% end %>
-      <br />
-      <% end %>
+  <body>
+    <div class="fractal-body">
+      <h2>Scatter-Gather Fractal Generation</h2>
+      <form action="start" method="post">
+        <select name="side">
+          <% nxn = [2,3,5,6,10,12,24,60] %>
+          <% nxn.each do |n| %>
+            <%= option_nxn n %>
+          <% end %>
+        </select>
+        <input type="submit" value="Generate">
+      </form>
+      <div id="fractal">
+        <% params["side"].to_i.times do |i| %>
+          <% params["side"].to_i.times do |j| %><img src="<%= part_file_name(j, i) %>" /><% end %>
+        <br />
+        <% end %>
+      </div>
     </div>
-    <a href="start/<%= params["side"] %>">Restart</a>
   </body>
 </html>
