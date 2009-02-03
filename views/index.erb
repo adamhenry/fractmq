@@ -22,7 +22,7 @@
   </head>
     <div id="fractal">
       <% params["side"].to_i.times do |i| %>
-        <% params["side"].to_i.times do |j| %><img src="<%= "#{FractMQ.base_file_name}#{j}.#{params["side"]-(i+1)}.png" %>" /><% end %>
+        <% params["side"].to_i.times do |j| %><img src="<%= part_file_name(j, i) %>" /><% end %>
       <br />
       <% end %>
     </div>

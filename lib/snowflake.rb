@@ -16,9 +16,9 @@ class FractMQ
   end
 
   def self.generate params 
-    snowflake = FractMQ.new( params )
-    snowflake.start_queue
-    EM.run { snowflake.each_tile { |tile| snowflake.publish_piece tile } }
+    fractmq = FractMQ.new( params )
+    fractmq.start_queue
+    EM.run { fractmq.each_tile { |tile| fractmq.publish_piece tile } }
   end
 
   def each_tile number=nil
@@ -42,7 +42,7 @@ class FractMQ
   end
 
   def publish_piece p=nil
-    set_piece p ||= @snowflake.piece
+    set_piece p ||= @fractmq.piece
     unless File.exists?( piece_name )
       puts ("Publishing Fractal Segment Request: " + piece_name )
       msg = {}
@@ -53,16 +53,16 @@ class FractMQ
   end
 
   def draw_piece p=nil
-    set_piece ( p ||= @snowflake.piece ) 
+    set_piece ( p ||= @fractmq.piece ) 
     file_name = "/tmp/fracMQ.#{@side}.#{rand(999_999)}.#{p[0]}.#{p[1]}##{Process.pid}"
-    @snowflake.draw( file_name )
+    @fractmq.draw( file_name )
     file = IO.read file_name
     File.delete(file_name)
     file
   end
 
   def piece_name p=nil
-    p ||= @snowflake.piece
+    p ||= @fractmq.piece
     FractMQ.dir + FractMQ.base_file_name + p.join('.') + ".png"
   end
 
@@ -83,7 +83,7 @@ class FractMQ
     raise "peice[0] must be < #{@side} <#{p[0]}>" if p[1] >= @side 
     raise "peice[0] must be >= 0 <#{p[0]}>" if p[0] < 0 
     raise "peice[1] must be >= 0 <#{p[1]}>" if p[1] < 0 
-    @snowflake.piece = p
+    @fractmq.piece = p
   end
 
   def set_side side
@@ -93,14 +93,14 @@ class FractMQ
   end
 
   def set_defaults
-    @snowflake = Julia.new(Complex(-0.3007, 0.6601), 5, 100)
-    @snowflake.pieces = [ @side, @side ]
-    @snowflake.width = 360
-    @snowflake.height = 360
-    @snowflake.m = 2
-    @snowflake.set_color = PNG::Color::White
-    @snowflake.algorithm = Algorithms::NormalizedIterationCount
-    @snowflake.theme = lambda { |index|
+    @fractmq = Julia.new(Complex(-0.3007, 0.6601), 5, 100)
+    @fractmq.pieces = [ @side, @side ]
+    @fractmq.width = 360
+    @fractmq.height = 360
+    @fractmq.m = 2
+    @fractmq.set_color = PNG::Color::White
+    @fractmq.algorithm = Algorithms::NormalizedIterationCount
+    @fractmq.theme = lambda { |index|
       r, g, b = 0, 0, 0      
       if index >= 510
         r = 0

@@ -19,3 +19,11 @@ get '/start/:side' do
   redirect '/' + params["side"].to_s
 end
 
+helpers do
+  def part_file_name j, i
+    file_name = "#{FractMQ.base_file_name}#{j}.#{params["side"]-(i+1)}.png"
+    file_name = "blank.png" unless File.exists?(FractMQ.dir + file_name)
+    file_name
+  end
+end
+
