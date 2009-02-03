@@ -7,29 +7,21 @@
         padding: 0px;
       }
       img {
-        height: 120px;
-        width: 120px;
+        height: <%= 360/params["side"] %>px;
+        width: <%= 360/params["side"] %>px;
       }
     </style>
   </head>
   <body>
     <table>
-       <tr>
-        <td><img src="snowflake0.2.png" /></td>
-        <td><img src="snowflake1.2.png" /></td>
-        <td><img src="snowflake2.2.png" /></td>
-       </tr>
-       <tr>
-        <td><img src="snowflake0.1.png" /></td>
-        <td><img src="snowflake1.1.png" /></td>
-        <td><img src="snowflake2.1.png" /></td>
-       </tr>
-       <tr>
-        <td><img src="snowflake0.0.png" /></td>
-        <td><img src="snowflake1.0.png" /></td>
-        <td><img src="snowflake2.0.png" /></td>
-       </tr>
+      <% params["side"].to_i.times do |i| %>
+      <tr>
+        <% params["side"].to_i.times do |j| %>
+        <td><img src="snowflake<%= "#{j}.#{params["side"]-(i+1)}.png" %>" /></td>
+        <% end %>
+      </tr>
+      <% end %>
     </table>
-    <a href="start">Restart</a>
+    <a href="start/<%= params["side"] %>">Restart</a>
   </body>
 <html>

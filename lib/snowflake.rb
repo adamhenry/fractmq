@@ -22,7 +22,7 @@ class Snowflake
   end
 
   def self.generate params 
-    snowflake = Snowflake.new( params[:side] )
+    snowflake = Snowflake.new( params )
     snowflake.start_queue
     EM.run { snowflake.each_tile { |tile| snowflake.publish_piece tile } }
   end
