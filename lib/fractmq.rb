@@ -22,7 +22,12 @@ class FractMQ
   end
 
   def each_tile number=nil
-    (number ||= @side).times { |i| number.times { |j| yield [i, j] } }
+    (number ||= @side).times { |i| number.times { |j| ( x ||= [] ) << [i, j] } }
+    FractMQ.array_rand(x).each { |p| yield p }
+  end
+
+  def self.array_rand array
+    array.length.times { (new_array ||= []) << array.delete_at( rand array.length ) }
   end
   
   def start_queue

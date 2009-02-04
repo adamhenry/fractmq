@@ -1,6 +1,6 @@
 
 require 'rush'
-require 'lib/snowflake'
+require 'lib/fractmq'
 
 def box
   @box ||= Rush::Box.new
