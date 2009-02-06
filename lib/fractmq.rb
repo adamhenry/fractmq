@@ -18,16 +18,34 @@ class FractMQ
   def self.generate params 
     fractmq = FractMQ.new( params )
     fractmq.start_queue
-    EM.run { fractmq.each_tile { |tile| fractmq.publish_piece tile } }
+    EM.run { fractmq.rand_tiles { |tile| fractmq.publish_piece tile } }
   end
 
-  def each_tile number=nil
-    (number ||= @side).times { |i| number.times { |j| ( x ||= [] ) << [i, j] } }
-    FractMQ.array_rand(x).each { |p| yield p }
+  def each_tile
+    all_tiles.each { |p| yield p }
+  end
+
+  def inject acc=nil
+    self.each do |part|
+      if acc == nil
+      end
+    end
+  end
+  
+  def rand_tiles number=nil
+    FractMQ.array_rand(all_tiles).each { |p| yield p }
+  end
+  
+  def all_tiles
+    x = []
+    @side.times { |i| @side.times { |j| x << [i, j] } }
+    x
   end
 
   def self.array_rand array
-    array.length.times { (new_array ||= []) << array.delete_at( rand array.length ) }
+    new_array = []
+    array.length.times { new_array << array.delete_at( rand(array.length) ) }
+    new_array
   end
   
   def start_queue
